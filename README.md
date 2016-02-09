@@ -1,21 +1,5 @@
 # Building docker images with two Dockerfiles
 
-It may happen that you need to authenticate with an external service when
-building a docker image. In order to do that, you need to have a secret
-available during build. That's a problem. This key will leak into a final image
-(wither via `docker history` or will be available directly in some layer).
-
-Here's a solution!
-
-Split your build process into two steps, each step represents its own dockerfile.
-
-1. Authenticate with external service in order to fetch sources (use private SSH key to authenticate with GitHub so you can clone a repo) and build the project.
-
-2. Get build artifacts from step 1 and install them.
-
-
-## Let's do this!
-
 First we need to write a Dockerfile which is able to fetch and build the project:
 
 ```dockerfile
@@ -70,13 +54,19 @@ docker build -f Dockerfile.release --tag=sen .
 Is the key in final image?
 
 ```shell
+cat ./test-if-key-is-present.sh
 if docker run sen test -f /id_rsa
 then
   printf "Key is in final image!\n"
   exit 2
 else
-  printf "Key is not in final image\n"
+  printf "Key is not in final image.\n"
 fi
+```
+
+```shell
+./test-if-key-is-present.sh
+Key is not in final image
 ```
 
 
@@ -85,3 +75,7 @@ You can also run the whole example by executing
 ```shell
 ./build.sh
 ```
+
+
+Here's [a blog post](http://blog.tomecek.net/post/build-docker-image-in-two-steps/) about this feature.
+
