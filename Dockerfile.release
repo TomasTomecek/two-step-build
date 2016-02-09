@@ -1,0 +1,5 @@
+FROM fedora:23
+COPY ./build-artifact/ /project
+RUN cd /project && \
+    pip3 install urwid && \
+    python3 ./setup.py install
